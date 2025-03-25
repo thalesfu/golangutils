@@ -29,9 +29,8 @@ func (h *SlsHook) Fire(entry *logrus.Entry) error {
 		{Key: proto.String("content"), Value: proto.String(entry.Message)},
 	}
 
-	logDataGroup := logging.GetLogContext(entry.Context)
-
-	for _, logData := range logDataGroup {
+	if logStore, ok := logging.GetContextLogStore(entry.Context); ok {
+		logData := logStore.GetAll()
 		for k, v := range logData {
 			contents = append(contents, &sls.LogContent{
 				Key:   proto.String(k),
